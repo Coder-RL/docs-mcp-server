@@ -10,12 +10,13 @@ import {
 } from "@langchain/openai";
 import { VECTOR_DIMENSION } from "../types";
 import { FixedDimensionEmbeddings } from "./FixedDimensionEmbeddings";
+import { MockEmbeddings } from "./MockEmbeddings";
 
 /**
  * Supported embedding model providers. Each provider requires specific environment
  * variables to be set for API access.
  */
-export type EmbeddingProvider = "openai" | "vertex" | "gemini" | "aws" | "microsoft";
+export type EmbeddingProvider = "openai" | "vertex" | "gemini" | "aws" | "microsoft" | "mock";
 
 /**
  * Error thrown when an invalid or unsupported embedding provider is specified.
@@ -183,6 +184,12 @@ export function createEmbeddingModel(providerAndModel: string): Embeddings {
         azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION,
         deploymentName: model,
       });
+    }
+
+    case "mock": {
+      // Mock embeddings for testing and development
+      const dimension = parseInt(model) || VECTOR_DIMENSION;
+      return new MockEmbeddings(dimension);
     }
 
     default:
